@@ -34,7 +34,7 @@ def predict():
     else:
         result = "✅ سليم"
 
-    # أهم العوامل
+    # 🔥 أهم العوامل
     importances = model.feature_importances_
     top_features = sorted(
         zip(features, importances),
@@ -42,16 +42,17 @@ def predict():
         reverse=True
     )[:3]
 
+    # 🧠 تحويل البيانات لقاموس
     patient = dict(zip(features, data))
 
-    # 🧠 تحليل ذكي
+    # 🧠 تحليل ذكي حسب القيم
     analysis = []
 
     if patient["age"] > 55:
-        analysis.append(f"👴 العمر مرتفع ({patient['age']})")
+        analysis.append(f"👴 العمر مرتفع ({patient['age']}) يزيد خطر أمراض القلب")
 
     if patient["chol"] > 240:
-        analysis.append(f"🧈 الكوليسترول عالي ({patient['chol']})")
+        analysis.append(f"🧈 الكوليسترول عالي ({patient['chol']}) وهذا عامل خطر")
 
     if patient["trestbps"] > 140:
         analysis.append(f"🩺 ضغط الدم مرتفع ({patient['trestbps']})")
@@ -60,70 +61,37 @@ def predict():
         analysis.append(f"❤️ نبض القلب منخفض ({patient['thalach']})")
 
     if patient["oldpeak"] > 2:
-        analysis.append(f"⚡ إجهاد على القلب ({patient['oldpeak']})")
+        analysis.append(f"⚡ يوجد إجهاد على القلب (oldpeak = {patient['oldpeak']})")
 
     if patient["exang"] == 1:
-        analysis.append("⚠️ ألم صدر أثناء التمرين")
+        analysis.append("⚠️ يوجد ألم صدر أثناء التمرين")
 
+    # لو ما فيه مشاكل
     if not analysis:
-        analysis.append("✅ القيم طبيعية")
+        analysis.append("✅ القيم تبدو طبيعية ولا تشير لخطر واضح")
 
-    # 📊 مقارنة بالقيم الطبيعية
-    comparison = []
-
-    if patient["chol"] > 240:
-        comparison.append(f"Cholesterol: {patient['chol']} (High ❗ | <200)")
-    else:
-        comparison.append(f"Cholesterol: {patient['chol']} (Normal ✅)")
-
-    if patient["trestbps"] > 140:
-        comparison.append(f"Blood Pressure: {patient['trestbps']} (High ❗ | ~120)")
-    else:
-        comparison.append(f"Blood Pressure: {patient['trestbps']} (Normal ✅)")
-
-    if patient["thalach"] < 100:
-        comparison.append(f"Heart Rate: {patient['thalach']} (Low ⚠️)")
-    else:
-        comparison.append(f"Heart Rate: {patient['thalach']} (Good ✅)")
-
-    if patient["fbs"] == 1:
-        comparison.append("Blood Sugar: High ❗")
-    else:
-        comparison.append("Blood Sugar: Normal ✅")
-
-    # 💡 توصيات
+    # 💡 توصيات ذكية
     advice = []
 
     if pred == 1:
-        advice.append("🥗 قلل الدهون")
-        advice.append("🏃‍♂️ مارس الرياضة")
-        advice.append("🩺 راقب ضغط الدم")
+        if patient["chol"] > 240:
+            advice.append("🥗 قلل الكوليسترول في الأكل")
+
+        if patient["trestbps"] > 140:
+            advice.append("🩺 راقب ضغط الدم باستمرار")
+
+        if patient["thalach"] < 100:
+            advice.append("🏃‍♂️ حاول تحسين اللياقة القلبية")
+
+        advice.append("🚶‍♂️ مارس الرياضة بانتظام")
+        advice.append("🥦 تناول غذاء صحي")
+
     else:
-        advice.append("✅ استمر على نمطك الصحي")
-        advice.append("🏃 حافظ على نشاطك")
-
-    # 🧾 تقرير كامل
-    report = f"""
-Patient Report
-
-Result: {result}
-
-Risk:
-- Disease: {prob[1]*100:.2f}%
-- No Disease: {prob[0]*100:.2f}%
-
-Analysis:
-"""
-    for a in analysis:
-        report += f"- {a}\n"
-
-    report += "\nComparison:\n"
-    for c in comparison:
-        report += f"- {c}\n"
-
-    report += "\nAdvice:\n"
-    for a in advice:
-        report += f"- {a}\n"
+        advice = [
+            "✅ استمر على نمطك الصحي",
+            "🏃 حافظ على نشاطك",
+            "🥗 استمر في الغذاء المتوازن"
+        ]
 
     return render_template(
         "index.html",
@@ -132,9 +100,7 @@ Analysis:
         disease=f"{prob[1]*100:.2f}",
         top_features=top_features,
         analysis=analysis,
-        comparison=comparison,
-        advice=advice,
-        report=report
+        advice=advice
     )
 
 if __name__ == "__main__":
