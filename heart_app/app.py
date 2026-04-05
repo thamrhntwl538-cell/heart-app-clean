@@ -5,8 +5,8 @@ import joblib
 app = Flask(__name__)
 
 # تحميل الموديل
-model = joblib.load("model.pkl")
-scaler = joblib.load("scaler.pkl")
+model = joblib.load("heart_app/model.pkl")
+scaler = joblib.load("heart_app/scaler.pkl")
 
 features = [
     "age","sex","cp","trestbps","chol","fbs",
@@ -34,7 +34,6 @@ def predict():
     else:
         result = "✅ سليم"
 
-    # أهم العوامل
     importances = model.feature_importances_
     top_features = sorted(
         zip(features, importances),
