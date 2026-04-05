@@ -35,11 +35,6 @@ body {
     border-radius: 20px;
 }
 
-h2 {
-    text-align: center;
-}
-
-/* FORM */
 .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -53,8 +48,6 @@ h2 {
 
 label {
     font-weight: bold;
-    margin-bottom: 5px;
-    color: #333;
 }
 
 input, select {
@@ -66,30 +59,24 @@ input, select {
 button {
     width: 100%;
     padding: 12px;
-    background: linear-gradient(45deg, #ff416c, #ff4b2b);
+    background: red;
     color: white;
     border: none;
     border-radius: 10px;
-    margin-top: 20px;
-    cursor: pointer;
 }
 
-/* BARS */
 .bar {
     height: 10px;
     border-radius: 5px;
-    margin-top: 5px;
 }
 
 .green { background: green; }
 .red { background: red; }
 
-/* CARDS */
 .cards {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
-    margin-top: 20px;
 }
 
 .card {
@@ -97,21 +84,17 @@ button {
     padding: 15px;
     border-radius: 15px;
     text-align: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
-/* 🔥 AI BOX */
 .ai-box {
     margin-top: 20px;
     padding: 15px;
-    border-radius: 15px;
+    border-radius: 10px;
 }
 
-.analysis { background: #eef; }
-.advice { background: #efe; }
-
-@media(max-width:800px){
-    .main { grid-template-columns: 1fr; }
+@media print {
+    .left { display: none; }
+    button { display: none; }
 }
 </style>
 
@@ -130,177 +113,103 @@ button {
 <form action="/predict" method="post">
 <div class="grid">
 
-<div>
-<label>Age</label>
-<input name="age">
-</div>
+<input name="age" placeholder="Age">
+<input name="trestbps" placeholder="Blood Pressure">
+<input name="chol" placeholder="Cholesterol">
+<input name="thalach" placeholder="Max Heart Rate">
+<input name="oldpeak" placeholder="Oldpeak">
 
-<div>
-<label>Sex</label>
 <select name="sex">
 <option value="1">Male</option>
 <option value="0">Female</option>
 </select>
-</div>
 
-<div>
-<label>Chest Pain Type</label>
 <select name="cp">
 <option value="0">Typical</option>
 <option value="1">Atypical</option>
 <option value="2">Non-anginal</option>
 <option value="3">Asymptomatic</option>
 </select>
-</div>
 
-<div>
-<label>Blood Pressure</label>
-<input name="trestbps">
-</div>
-
-<div>
-<label>Cholesterol</label>
-<input name="chol">
-</div>
-
-<div>
-<label>Fasting Blood Sugar</label>
 <select name="fbs">
 <option value="0">Normal</option>
 <option value="1">High</option>
 </select>
-</div>
 
-<div>
-<label>Rest ECG</label>
 <select name="restecg">
 <option value="0">Normal</option>
 <option value="1">Abnormal</option>
 <option value="2">Hypertrophy</option>
 </select>
-</div>
 
-<div>
-<label>Max Heart Rate</label>
-<input name="thalach">
-</div>
-
-<div>
-<label>Exercise Angina</label>
 <select name="exang">
 <option value="0">No</option>
 <option value="1">Yes</option>
 </select>
-</div>
 
-<div>
-<label>Oldpeak</label>
-<input name="oldpeak">
-</div>
-
-<div>
-<label>Slope</label>
 <select name="slope">
 <option value="0">Up</option>
 <option value="1">Flat</option>
 <option value="2">Down</option>
 </select>
-</div>
 
-<div>
-<label>CA (vessels)</label>
 <select name="ca">
 <option value="0">0</option>
 <option value="1">1</option>
 <option value="2">2</option>
 <option value="3">3</option>
 </select>
-</div>
 
-<div>
-<label>Thal</label>
 <select name="thal">
 <option value="1">Normal</option>
 <option value="2">Fixed</option>
 <option value="3">Reversible</option>
 </select>
-</div>
 
 </div>
 
-<button type="submit">🔍 Predict</button>
+<button type="submit">Predict</button>
 </form>
 </div>
 
 <!-- RIGHT -->
 <div class="right">
 
-<h2>📊 Result Dashboard</h2>
-
 {% if result %}
 
-<p>🟢 No Disease: {{ no_disease }}%</p>
+<h3>{{ result }}</h3>
+
+<p>No Disease: {{ no_disease }}%</p>
 <div class="bar green" style="width: {{ no_disease }}%"></div>
 
-<p>🔴 Disease: {{ disease }}%</p>
+<p>Disease: {{ disease }}%</p>
 <div class="bar red" style="width: {{ disease }}%"></div>
 
 <div class="cards">
-
-<div class="card">
-<h3>🩺 Status</h3>
-<p>{{ result }}</p>
+<div class="card"><h4>Status</h4>{{ result }}</div>
+<div class="card"><h4>Risk</h4>{{ disease }}%</div>
 </div>
 
-<div class="card">
-<h3>📊 Risk</h3>
-<p>{{ disease }}%</p>
+<div class="ai-box" style="background:#eef;">
+<h4>Analysis</h4>
+<ul>{% for i in analysis %}<li>{{ i }}</li>{% endfor %}</ul>
 </div>
 
-<div class="card">
-<h3>⚠️ Level</h3>
-<p>
-{% if disease|float > 70 %} High
-{% elif disease|float > 40 %} Medium
-{% else %} Low
-{% endif %}
-</p>
+<div class="ai-box" style="background:#fff3cd;">
+<h4>Comparison</h4>
+<ul>{% for c in comparison %}<li>{{ c }}</li>{% endfor %}</ul>
 </div>
 
-<div class="card">
-<h3>❤️ Key Factors</h3>
-<ul>
-{% for f, v in top_features %}
-<li>{{ f }}</li>
-{% endfor %}
-</ul>
+<div class="ai-box" style="background:#efe;">
+<h4>Advice</h4>
+<ul>{% for a in advice %}<li>{{ a }}</li>{% endfor %}</ul>
 </div>
 
+<div class="ai-box" style="background:#ddd;">
+<h4>Report</h4>
+<pre>{{ report }}</pre>
+<button onclick="window.print()">Print</button>
 </div>
-
-<!-- 🧠 SMART ANALYSIS -->
-{% if analysis %}
-<div class="ai-box analysis">
-<h3>🧠 Smart Analysis</h3>
-<ul>
-{% for item in analysis %}
-<li>{{ item }}</li>
-{% endfor %}
-</ul>
-</div>
-{% endif %}
-
-<!-- 💡 RECOMMENDATIONS -->
-{% if advice %}
-<div class="ai-box advice">
-<h3>💡 Recommendations</h3>
-<ul>
-{% for a in advice %}
-<li>{{ a }}</li>
-{% endfor %}
-</ul>
-</div>
-{% endif %}
 
 {% endif %}
 
