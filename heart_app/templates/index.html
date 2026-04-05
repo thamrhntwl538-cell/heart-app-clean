@@ -2,58 +2,31 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Heart Disease AI</title>
+<title>Heart AI</title>
 
 <style>
 body {
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-    background: url("https://images.unsplash.com/photo-1588776814546-1ffcf47267a5") no-repeat center center fixed;
-    background-size: cover;
-}
-
-.overlay {
-    background: rgba(0,0,0,0.7);
-    min-height: 100vh;
-    padding: 20px;
+    font-family: Arial;
+    background: #222;
 }
 
 .container {
-    max-width: 1200px;
-    margin: auto;
-}
-
-.main {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
+    padding: 20px;
 }
 
-.left, .right {
+.box {
     background: white;
     padding: 20px;
-    border-radius: 20px;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-
-.grid div {
-    display: flex;
-    flex-direction: column;
-}
-
-label {
-    font-weight: bold;
+    border-radius: 15px;
 }
 
 input, select {
+    width: 100%;
     padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
+    margin: 5px 0;
 }
 
 button {
@@ -73,27 +46,21 @@ button {
 .green { background: green; }
 .red { background: red; }
 
-.cards {
+/* comparison */
+.comparison-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 10px;
 }
 
-.card {
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 15px;
-    text-align: center;
-}
-
-.ai-box {
-    margin-top: 20px;
-    padding: 15px;
+.comp-card {
+    padding: 10px;
     border-radius: 10px;
+    background: #eee;
 }
 
 @media print {
-    .left { display: none; }
+    form { display: none; }
     button { display: none; }
 }
 </style>
@@ -102,22 +69,19 @@ button {
 
 <body>
 
-<div class="overlay">
 <div class="container">
-<div class="main">
 
 <!-- LEFT -->
-<div class="left">
+<div class="box">
+
 <h2>🩺 Input Data</h2>
 
 <form action="/predict" method="post">
-<div class="grid">
 
 <input name="age" placeholder="Age">
 <input name="trestbps" placeholder="Blood Pressure">
 <input name="chol" placeholder="Cholesterol">
-<input name="thalach" placeholder="Max Heart Rate">
-<input name="oldpeak" placeholder="Oldpeak">
+<input name="thalach" placeholder="Heart Rate">
 
 <select name="sex">
 <option value="1">Male</option>
@@ -126,8 +90,6 @@ button {
 
 <select name="cp">
 <option value="0">Typical</option>
-<option value="1">Atypical</option>
-<option value="2">Non-anginal</option>
 <option value="3">Asymptomatic</option>
 </select>
 
@@ -138,8 +100,6 @@ button {
 
 <select name="restecg">
 <option value="0">Normal</option>
-<option value="1">Abnormal</option>
-<option value="2">Hypertrophy</option>
 </select>
 
 <select name="exang">
@@ -149,32 +109,36 @@ button {
 
 <select name="slope">
 <option value="0">Up</option>
-<option value="1">Flat</option>
-<option value="2">Down</option>
 </select>
 
 <select name="ca">
 <option value="0">0</option>
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
 </select>
 
 <select name="thal">
 <option value="1">Normal</option>
-<option value="2">Fixed</option>
-<option value="3">Reversible</option>
 </select>
 
-</div>
+<button>Predict</button>
 
-<button type="submit">Predict</button>
 </form>
+
 </div>
 
 <!-- RIGHT -->
-<div class="right">
+<div class="box">
 
+<!-- 🔥 العنوان دائم -->
+<h2 style="text-align:center;">📊 Result Dashboard</h2>
+
+<!-- 🔥 قبل التنبؤ -->
+{% if not result %}
+<p style="text-align:center; color:gray;">
+👈 أدخل البيانات واضغط Predict
+</p>
+{% endif %}
+
+<!-- 🔥 بعد التنبؤ -->
 {% if result %}
 
 <h3>{{ result }}</h3>
@@ -185,38 +149,36 @@ button {
 <p>Disease: {{ disease }}%</p>
 <div class="bar red" style="width: {{ disease }}%"></div>
 
-<div class="cards">
-<div class="card"><h4>Status</h4>{{ result }}</div>
-<div class="card"><h4>Risk</h4>{{ disease }}%</div>
+<h3>🧠 Analysis</h3>
+<ul>
+{% for a in analysis %}
+<li>{{ a }}</li>
+{% endfor %}
+</ul>
+
+<h3>📊 Comparison</h3>
+<div class="comparison-grid">
+{% for c in comparison %}
+<div class="comp-card">{{ c }}</div>
+{% endfor %}
 </div>
 
-<div class="ai-box" style="background:#eef;">
-<h4>Analysis</h4>
-<ul>{% for i in analysis %}<li>{{ i }}</li>{% endfor %}</ul>
-</div>
+<h3>💡 Advice</h3>
+<ul>
+{% for a in advice %}
+<li>{{ a }}</li>
+{% endfor %}
+</ul>
 
-<div class="ai-box" style="background:#fff3cd;">
-<h4>Comparison</h4>
-<ul>{% for c in comparison %}<li>{{ c }}</li>{% endfor %}</ul>
-</div>
-
-<div class="ai-box" style="background:#efe;">
-<h4>Advice</h4>
-<ul>{% for a in advice %}<li>{{ a }}</li>{% endfor %}</ul>
-</div>
-
-<div class="ai-box" style="background:#ddd;">
-<h4>Report</h4>
+<h3>🧾 Report</h3>
 <pre>{{ report }}</pre>
+
 <button onclick="window.print()">Print</button>
-</div>
 
 {% endif %}
 
 </div>
 
-</div>
-</div>
 </div>
 
 </body>
