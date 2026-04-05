@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Heart Disease AI</title>
+
+<style>
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background: url("https://images.unsplash.com/photo-1588776814546-1ffcf47267a5") no-repeat center center fixed;
+    background-size: cover;
+}
+
+.overlay {
+    background: rgba(0,0,0,0.7);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+.main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.left, .right {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+h2 {
+    text-align: center;
+}
+
+/* 🔥 الفورم */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.grid div {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 🔥 LABEL واضح */
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+    font-size: 14px;
+}
+
+/* 🔥 INPUT */
+input, select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+/* 🔥 BUTTON */
+button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(45deg, #ff416c, #ff4b2b);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    margin-top: 20px;
+    cursor: pointer;
+}
+
+/* 🔥 BARS */
+.bar {
+    height: 10px;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+.green { background: green; }
+.red { background: red; }
+
+/* 🔥 CARDS */
+.cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.card {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* 📱 موبايل */
+@media(max-width:800px){
+    .main { grid-template-columns: 1fr; }
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="overlay">
+
+<div class="container">
+
+<div class="main">
+
+<!-- LEFT -->
+<div class="left">
+
+<h2>🩺 Input Data</h2>
+
+<form action="/predict" method="post">
+
+<div class="grid">
+
+<div>
+<label>Age</label>
+<input name="age">
+</div>
+
+<div>
+<label>Sex</label>
+<select name="sex">
+<option value="1">Male</option>
+<option value="0">Female</option>
+</select>
+</div>
+
+<div>
+<label>Chest Pain Type</label>
+<select name="cp">
+<option value="0">Typical</option>
+<option value="1">Atypical</option>
+<option value="2">Non-anginal</option>
+<option value="3">Asymptomatic</option>
+</select>
+</div>
+
+<div>
+<label>Blood Pressure</label>
+<input name="trestbps">
+</div>
+
+<div>
+<label>Cholesterol</label>
+<input name="chol">
+</div>
+
+<div>
+<label>Fasting Blood Sugar</label>
+<select name="fbs">
+<option value="0">Normal</option>
+<option value="1">High</option>
+</select>
+</div>
+
+<div>
+<label>Rest ECG</label>
+<select name="restecg">
+<option value="0">Normal</option>
+<option value="1">Abnormal</option>
+<option value="2">Hypertrophy</option>
+</select>
+</div>
+
+<div>
+<label>Max Heart Rate</label>
+<input name="thalach">
+</div>
+
+<div>
+<label>Exercise Angina</label>
+<select name="exang">
+<option value="0">No</option>
+<option value="1">Yes</option>
+</select>
+</div>
+
+<div>
+<label>Oldpeak</label>
+<input name="oldpeak">
+</div>
+
+<div>
+<label>Slope</label>
+<select name="slope">
+<option value="0">Up</option>
+<option value="1">Flat</option>
+<option value="2">Down</option>
+</select>
+</div>
+
+<div>
+<label>CA (vessels)</label>
+<select name="ca">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+</select>
+</div>
+
+<div>
+<label>Thal</label>
+<select name="thal">
+<option value="1">Normal</option>
+<option value="2">Fixed</option>
+<option value="3">Reversible</option>
+</select>
+</div>
+
+</div>
+
+<button type="submit">🔍 Predict</button>
+
+</form>
+
+</div>
+
+<!-- RIGHT -->
+<div class="right">
+
+<h2>📊 Result Dashboard</h2>
+
+{% if result %}
+
+<p>🟢 No Disease: {{ no_disease }}%</p>
+<div class="bar green" style="width: {{ no_disease }}%"></div>
+
+<p>🔴 Disease: {{ disease }}%</p>
+<div class="bar red" style="width: {{ disease }}%"></div>
+
+<div class="cards">
+
+<div class="card">
+<h3>🩺 Status</h3>
+<p>{{ result }}</p>
+</div>
+
+<div class="card">
+<h3>📊 Risk</h3>
+<p>{{ disease }}%</p>
+</div>
+
+<div class="card">
+<h3>⚠️ Level</h3>
+<p>
+{% if disease|float > 70 %}
+High
+{% elif disease|float > 40 %}
+Medium
+{% else %}
+Low
+{% endif %}
+</p>
+</div>
+
+<div class="card">
+<h3>❤️ Key Factors</h3>
+<ul>
+{% for f, v in top_features %}
+<li>{{ f }}</li>
+{% endfor %}
+</ul>
+</div>
+
+</div>
+
+{% endif %}
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>
