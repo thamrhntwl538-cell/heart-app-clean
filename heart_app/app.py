@@ -4,7 +4,7 @@ import joblib
 
 app = Flask(__name__)
 
-# تحميل الموديل
+# Load model
 model = joblib.load("heart_app/model.pkl")
 scaler = joblib.load("heart_app/scaler.pkl")
 
@@ -30,11 +30,11 @@ def predict():
     prob = model.predict_proba(scaled)[0]
 
     if pred == 1:
-        result = "⚠️ لديه مرض قلب"
+        result = "⚠️ Heart disease detected"
     else:
-        result = "✅ سليم"
+        result = "✅ Healthy"
 
-    # 🔥 أهم العوامل
+    # 🔥 Most important features
     importances = model.feature_importances_
     top_features = sorted(
         zip(features, importances),
@@ -42,55 +42,55 @@ def predict():
         reverse=True
     )[:3]
 
-    # 🧠 تحويل البيانات لقاموس
+    # 🧠 Convert data to dictionary
     patient = dict(zip(features, data))
 
-    # 🧠 تحليل ذكي حسب القيم
+    # 🧠 Smart analysis based on values
     analysis = []
 
     if patient["age"] > 55:
-        analysis.append(f"👴 العمر مرتفع ({patient['age']}) يزيد خطر أمراض القلب")
+        analysis.append(f"👴 Age is high ({patient['age']}) which increases heart disease risk")
 
     if patient["chol"] > 240:
-        analysis.append(f"🧈 الكوليسترول عالي ({patient['chol']}) وهذا عامل خطر")
+        analysis.append(f"🧈 High cholesterol ({patient['chol']}) is a risk factor")
 
     if patient["trestbps"] > 140:
-        analysis.append(f"🩺 ضغط الدم مرتفع ({patient['trestbps']})")
+        analysis.append(f"🩺 High blood pressure ({patient['trestbps']})")
 
     if patient["thalach"] < 100:
-        analysis.append(f"❤️ نبض القلب منخفض ({patient['thalach']})")
+        analysis.append(f"❤️ Low heart rate ({patient['thalach']})")
 
     if patient["oldpeak"] > 2:
-        analysis.append(f"⚡ يوجد إجهاد على القلب (oldpeak = {patient['oldpeak']})")
+        analysis.append(f"⚡ Heart stress detected (oldpeak = {patient['oldpeak']})")
 
     if patient["exang"] == 1:
-        analysis.append("⚠️ يوجد ألم صدر أثناء التمرين")
+        analysis.append("⚠️ Exercise-induced chest pain detected")
 
-    # لو ما فيه مشاكل
+    # If no issues
     if not analysis:
-        analysis.append("✅ القيم تبدو طبيعية ولا تشير لخطر واضح")
+        analysis.append("✅ Values appear normal with no clear risk indicators")
 
-    # 💡 توصيات ذكية
+    # 💡 Smart advice
     advice = []
 
     if pred == 1:
         if patient["chol"] > 240:
-            advice.append("🥗 قلل الكوليسترول في الأكل")
+            advice.append("🥗 Reduce cholesterol in your diet")
 
         if patient["trestbps"] > 140:
-            advice.append("🩺 راقب ضغط الدم باستمرار")
+            advice.append("🩺 Monitor blood pressure regularly")
 
         if patient["thalach"] < 100:
-            advice.append("🏃‍♂️ حاول تحسين اللياقة القلبية")
+            advice.append("🏃‍♂️ Improve cardiovascular fitness")
 
-        advice.append("🚶‍♂️ مارس الرياضة بانتظام")
-        advice.append("🥦 تناول غذاء صحي")
+        advice.append("🚶‍♂️ Exercise regularly")
+        advice.append("🥦 Maintain a healthy diet")
 
     else:
         advice = [
-            "✅ استمر على نمطك الصحي",
-            "🏃 حافظ على نشاطك",
-            "🥗 استمر في الغذاء المتوازن"
+            "✅ Keep up your healthy lifestyle",
+            "🏃 Stay active",
+            "🥗 Maintain a balanced diet"
         ]
 
     return render_template(
